@@ -3,8 +3,6 @@ const dotenv = require('dotenv');
 dotenv.config({ path: './config.env' });
 const app = require('./app');
 const cors = require('cors');
-const rosStart = require('./rosStart');
-
 
 
 app.get(cors());

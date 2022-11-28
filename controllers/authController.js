@@ -182,7 +182,7 @@ exports.logout = (req, res) => {
 
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
-    // console.log(req.body);
+    console.log('updateMyPassword Triggered');
     // console.log('Password reset req');
     //get user from the collection
 
@@ -198,6 +198,9 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
     
         // log the user in , send JWT
         createSendToken(user, 200, res);
+
+        console.log('updateMyPassword Ended');
+
     
     
 
