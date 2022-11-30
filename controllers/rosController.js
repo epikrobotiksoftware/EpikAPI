@@ -205,6 +205,9 @@ exports.sendGoal = async (req, res) => {
     // one last thing
     // marker.rotation must be converted Euler to Quaterion search this and write the converted values
     // you have only yaw degree so convert (0,0,y) to (x,y,z,w) 
+
+    const rotationArray = [0,0,marker.rotation];
+    const rotationROS = eulerToQte(rotationArray);
     request.goal = {
         position: {
           x: marker.x,
@@ -212,18 +215,12 @@ exports.sendGoal = async (req, res) => {
           z: 0
         },
         orientation: { // here
-          x: 0,
-          y: 0,
-          z: 0,
-          w: 1
+          x: rotationROS[0],
+          y: rotationROS[1],
+          z: rotationROS[2],
+          w: rotationROS[3]
         }
       };
-      console.log(`rotation in db : ${marker.rotation}` );
-
-      const rotationArray = [0,0,marker.rotation];
-      const rotationROS = eulerToQte(rotationArray);
-      request.rotation = rotationROS;
-      console.log(`Rotation sent to ROS ${rotationROS} ` );
     //   request.marker_name = marker.name;
 
     rosnodejs.initNode('/my_node')
