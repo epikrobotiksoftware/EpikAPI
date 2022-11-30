@@ -4,7 +4,8 @@ const rosnodejs = require('rosnodejs');
 const { EventEmitter } = require('stream');
 const robot_msgs = rosnodejs.require('robot').msg;
 const Position = require('./../models/rosModel')
-const AddPositionMarkerSrv = rosnodejs.require('for_arslan').srv.AddPositionMarker;
+const eulerToQte = require('euler-to-quaternion')
+const PositionMarkerNavigateSrv = rosnodejs.require('mir_navigation').srv.PositionMarkerNavigate;
 
 
 
@@ -57,6 +58,7 @@ exports.listenCommand = (req, res) => {
             rosnodejs.log.error(err.stack);
         })
 }
+
 exports.joystick = (req, res) => {
     const start = Date.now();
     rosnodejs.initNode('/my_node')
@@ -98,6 +100,7 @@ exports.joystick = (req, res) => {
         });
 
 }
+
 exports.batteryStatus = (req, res) => {
     var percent = lastestStatusMsg.battery_percentege;
 
@@ -164,6 +167,7 @@ exports.getAllPositionMarkers = async (req, res) => {
         console.log(err);
     }
 }
+
 exports.getPositionMarker = async (req, res) => {
 
     try {
@@ -178,6 +182,7 @@ exports.getPositionMarker = async (req, res) => {
         console.log(err);
     }
 }
+
 exports.deletePositionMarker = async (req, res) => {
 
     try {
@@ -193,32 +198,38 @@ exports.deletePositionMarker = async (req, res) => {
     }
 }
 
-
-
 exports.sendGoal = async (req, res) => {
-    var request = new AddPositionMarkerSrv.Request();
+    var request = new PositionMarkerNavigateSrv.Request();
 
     const marker = await Position.findById(req.params.id);
-    request.position = {
+    // one last thing
+    // marker.rotation must be converted Euler to Quaterion search this and write the converted values
+    // you have only yaw degree so convert (0,0,y) to (x,y,z,w) 
+    request.goal = {
         position: {
           x: marker.x,
           y: marker.y,
           z: 0
         },
-        orientation: {
+        orientation: { // here
           x: 0,
           y: 0,
           z: 0,
           w: 1
         }
       };
-      request.rotation = marker.rotation;
-      request.marker_name = marker.name;
+      console.log(`rotation in db : ${marker.rotation}` );
+
+      const rotationArray = [0,0,marker.rotation];
+      const rotationROS = eulerToQte(rotationArray);
+      request.rotation = rotationROS;
+      console.log(`Rotation sent to ROS ${rotationROS} ` );
+    //   request.marker_name = marker.name;
 
     rosnodejs.initNode('/my_node')
         .then(() => {
             const nh = rosnodejs.nh;
-            const client = nh.serviceClient('/add_position_marker', 'for_arslan/AddPositionMarker');
+            const client = nh.serviceClient('/PositionMarkerNavigate', 'mir_navigation/PositionMarkerNavigate');
             client.call(request);
             res.status(200).json({
                 Status: 'success',
