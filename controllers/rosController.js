@@ -1,14 +1,9 @@
-const { emit } = require('process');
-const ROSLIB = require('roslib')
 const rosnodejs = require('rosnodejs');
 const { EventEmitter } = require('stream');
 const robot_msgs = rosnodejs.require('robot').msg;
 const Position = require('./../models/rosModel')
 const eulerToQte = require('euler-to-quaternion')
 const PositionMarkerNavigateSrv = rosnodejs.require('mir_navigation').srv.PositionMarkerNavigate;
-
-
-
 
 //listening  to the robotState topic
 var lastestStatusMsg = {}
