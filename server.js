@@ -8,10 +8,12 @@ const cors = require('cors');
 app.get(cors());
 
 
-const DB = process.env.DATABASE.replace('<PASSWORD>',
-  process.env.DATABASE_PASSWORD);
+// const DB = process.env.DATABASE.replace('<PASSWORD>',
+//   process.env.DATABASE_PASSWORD);
 
-// rosStart.rosStart();
+const DB = 'mongodb://localhost:27017';
+
+
 
 mongoose.connect(DB, {
   useNewUrlParser: true,

@@ -107,7 +107,14 @@ exports.batteryStatus = (req, res) => {
             Battery: percent
         })
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        res.status(500).json({
+            status: 'fail',
+            data:{
+                err
+            }
+        })
+        
     }
 
 }

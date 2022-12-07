@@ -10,6 +10,7 @@ const app = express();
 app.use(express.json());
 const cors = require('cors');
 const rosRouter = require('./routers/rosRouter');
+const imageRoute = require('./routers/imageRouter');
 //////////////////
 
 app.get(helmet());
@@ -35,6 +36,7 @@ if (process.env.NODE_ENV === 'development') {
 
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/ros', rosRouter);
+app.use('/api/v1/images',imageRoute);
 
 app.all('*', (req, res, next) => {
 
