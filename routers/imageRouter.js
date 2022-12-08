@@ -1,17 +1,27 @@
 const express = require('express');
 const imageController = require('./../controllers/imageController');
 const multer = require('multer');
-const upload = multer({ dest: 'upload/' });
 
+
+const upload = multer({
+    storage: imageController.storage,
+    limits: {
+        fileSize: 1024 * 1024 * 5
+    },
+    fileFilter: imageController.fileFilter
+});
 
 
 const router = express.Router();
-router.get('/getImage',
+router.get('/getImage/:path',
+    //   express.static('../upload')
     imageController.getImage
 );
 
 router.post('/uploadImage',
-    // upload.single('userImage'),
-    imageController.config,
-    imageController.uploadImage)
+    upload.single('userImage'),
+    imageController.uploadImage
+);
+
+
 module.exports = router;
