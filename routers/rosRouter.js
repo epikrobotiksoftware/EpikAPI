@@ -1,6 +1,8 @@
 const express = require('express');
 const authController = require("./../controllers/authController");
-const rossController = require("./../controllers/rosController");
+const rosController = require("./../controllers/rosController");
+const positionController = require('../controllers/positionController');
+
 
 
 
@@ -8,32 +10,32 @@ const router = express.Router();
 
 router.post('/rosApi',
     // authController.protect,
-    rossController.listenCommand);
+    rosController.listenCommand);
 router.post('/joystick',
     // authController.protect,
-    rossController.joystick);
+    rosController.joystick);
 
 router.get('/battery',
     // authController.protect,
-    rossController.batteryStatus
+    rosController.batteryStatus
 );
 
 router.get('/robotStatus',
     // authController.protect,
-    rossController.robotStatus);
+    rosController.robotStatus);
 
 router
     .route('/positionMarker')
-    .get(rossController.getAllPositionMarkers)
-    .post(rossController.createPositionMarker);
+    .get(positionController.getAllPositionMarkers)
+    .post(positionController.createPositionMarker);
 
 router
     .route('/positionMarker/:id')
-    .get(rossController.getPositionMarker)
-    .delete(rossController.deletePositionMarker);
+    .get(positionController.getPositionMarker)
+    .delete(positionController.deletePositionMarker);
 
 router.post('/sendGoal/:id',
-    rossController.sendGoal
+    positionController.sendGoal
 );
 
 module.exports = router;

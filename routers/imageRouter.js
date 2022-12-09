@@ -14,7 +14,6 @@ const upload = multer({
 
 const router = express.Router();
 router.get('/getImage/:path',
-    //   express.static('../upload')
     imageController.getImage
 );
 
