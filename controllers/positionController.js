@@ -72,12 +72,8 @@ exports.sendGoal = async (req, res) => {
     var request = new PositionMarkerNavigateSrv.Request();
 
     const marker = await Position.findById(req.params.id);
-    // one last thing
-    // marker.rotation must be converted Euler to Quaterion search this and write the converted values
-    // you have only yaw degree so convert (0,0,y) to (x,y,z,w) 
 
     const rotationArray = {x: 0, y: 0, z: marker.rotation };
-    // [0,0,marker.rotation];
     const rotationROS = eulerToQte.eulerToQuaternion(rotationArray);
     console.log(rotationROS);
     request.goal = {
