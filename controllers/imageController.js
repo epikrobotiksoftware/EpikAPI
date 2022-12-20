@@ -36,7 +36,7 @@ exports.uploadImage = async (req, res) => {
     await newPicture
       .save()
       .then((doc) => {
-        // console.log('Image information upload successfully');
+        console.log('Image information upload successfully');
       })
       .catch((err) => {
         console.log(err);
