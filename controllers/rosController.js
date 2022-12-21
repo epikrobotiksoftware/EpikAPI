@@ -162,6 +162,9 @@ exports.saveMap = async (req, res, next) => {
           image.rotate(180);
           image.mirror(true, false);
           image.write(`images/map.jpg`);
+          nh.unsubscribe('/map');
+
+          //   rosnodejs.shutdown();
           const ipAddress = ip.address();
           var ImageURL = `${req.protocol}://${ipAddress}:5050/map.jpg`;
           const newPicture = new imageModel({
@@ -174,19 +177,24 @@ exports.saveMap = async (req, res, next) => {
             Message: 'Image has been sent uploaded successfully',
             link: ImageURL,
           };
-          saveMapObject = object;
+          //   saveMapObject = object;
           await newPicture
             .save()
             .then((doc) => {
-              //   console.log('doc saved successfully', doc);
-
-              next();
+              console.log('doc saved successfully', doc);
             })
             .catch((err) => {
               console.log(err);
             });
+          handleResponse(object);
         }
       );
+      function handleResponse(object) {
+        // console.log(object);
+        res.status(200).json({
+          object,
+        });
+      }
     })
     .catch((err) => {
       res.status(200).json({
@@ -194,7 +202,4 @@ exports.saveMap = async (req, res, next) => {
       });
       console.log(err);
     });
-  res.status(200).json({
-    saveMapObject,
-  });
 };
