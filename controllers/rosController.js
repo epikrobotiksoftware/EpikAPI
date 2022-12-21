@@ -7,7 +7,6 @@ var ip = require('ip');
 
 //listening  to the robotState topic
 var lastestStatusMsg = {};
-var saveMapObject;
 rosnodejs.initNode('/my_node').then(() => {
   const nh = rosnodejs.nh;
   const sub = nh.subscribe('/robot_state', 'robot/RobotState', (msg) => {
@@ -124,82 +123,51 @@ exports.robotStatus = (req, res) => {
 };
 
 exports.saveMap = async (req, res, next) => {
-  rosnodejs
-    .initNode('/my_node')
-    .then(() => {
-      const nh = rosnodejs.nh;
-      const sub = nh.subscribe(
-        '/map',
-        'nav_msgs/OccupancyGrid',
-        async (msg) => {
-          const width = msg.info.width;
-          const height = msg.info.height;
-          const image = new Jimp(width, height);
-          var invertedValue = null;
+  try {
+    await rosnodejs.initNode('/my_node');
+    const nh = rosnodejs.nh;
+    const sub = nh.subscribe('/map', 'nav_msgs/OccupancyGrid', async (msg) => {
+      const width = msg.info.width;
+      const height = msg.info.height;
+      const image = new Jimp(width, height);
 
-          for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
-              const index = y * width + x;
-              const value = msg.data[index];
-              if (value === 0) {
-                invertedValue = 255;
-              } else {
-                invertedValue = 0;
-              }
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const index = y * width + x;
+          const value = msg.data[index];
+          const invertedValue = value === 0 ? 255 : 0;
 
-              image.setPixelColor(
-                Jimp.rgbaToInt(
-                  invertedValue,
-                  invertedValue,
-                  invertedValue,
-                  255
-                ),
-                x,
-                y
-              );
-            }
-          }
-          image.rotate(180);
-          image.mirror(true, false);
-          image.write(`images/map.jpg`);
-          nh.unsubscribe('/map');
-
-          //   rosnodejs.shutdown();
-          const ipAddress = ip.address();
-          var ImageURL = `${req.protocol}://${ipAddress}:5050/map.jpg`;
-          const newPicture = new imageModel({
-            path: 'images/map.jpg',
-            type: 'map',
-            Date: Date.now(),
-            link: ImageURL,
-          });
-          var object = {
-            Message: 'Image has been sent uploaded successfully',
-            link: ImageURL,
-          };
-          //   saveMapObject = object;
-          await newPicture
-            .save()
-            .then((doc) => {
-              console.log('doc saved successfully', doc);
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-          handleResponse(object);
+          image.setPixelColor(
+            Jimp.rgbaToInt(invertedValue, invertedValue, invertedValue, 255),
+            x,
+            y
+          );
         }
-      );
-      function handleResponse(object) {
-        // console.log(object);
-        res.status(200).json({
-          object,
-        });
       }
-    })
-    .catch((err) => {
-      res.status(200).json({
-        err,
+      image.rotate(180);
+      image.mirror(true, false);
+      image.write(`images/map.jpg`);
+      nh.unsubscribe('/map');
+
+      // rosnodejs.shutdown();
+      const ipAddress = ip.address();
+      const imageURL = `${req.protocol}://${ipAddress}:5050/map.jpg`;
+      const newPicture = new imageModel({
+        path: 'images/map.jpg',
+        type: 'map',
+        Date: Date.now(),
+        link: imageURL,
       });
-      console.log(err);
+      const object = {
+        Message: 'Image has been sent uploaded successfully',
+        link: imageURL,
+      };
+      // saveMapObject = object;
+      await newPicture.save();
+      res.status(200).json({ object });
     });
+  } catch (err) {
+    res.status(200).json({ err });
+    console.log(err);
+  }
 };
