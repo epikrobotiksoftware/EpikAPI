@@ -7,12 +7,16 @@ var ip = require('ip');
 
 //listening  to the robotState topic
 var lastestStatusMsg = {};
-rosnodejs.initNode('/my_node').then(() => {
+rosnodejs.initNode(process.env.ROSNODE).then(() => {
   const nh = rosnodejs.nh;
-  const sub = nh.subscribe('/robot_state', 'robot/RobotState', (msg) => {
-    // console.log(msg);
-    lastestStatusMsg = msg;
-  });
+  const sub = nh.subscribe(
+    process.env.RobotStateTopic,
+    process.env.RobotStateType,
+    (msg) => {
+      // console.log(msg);
+      lastestStatusMsg = msg;
+    }
+  );
 });
 
 var counter = 0;
@@ -23,7 +27,7 @@ exports.listenCommand = (req, res) => {
   const { stringify } = require('querystring');
 
   rosnodejs
-    .initNode('/my_node')
+    .initNode(process.env.ROSNODE)
     .then(() => {
       const nh = rosnodejs.nh;
       const arslan = nh.setParam(String(req.body.param), req.body.val);
@@ -52,12 +56,15 @@ exports.listenCommand = (req, res) => {
 
 exports.joystick = (req, res) => {
   const start = Date.now();
-  rosnodejs.initNode('/my_node').then(() => {
+  rosnodejs.initNode(process.env.ROSNODE).then(() => {
     const endTime = Date.now();
     // console.log('Node Difference', endTime-start);
     const nh = rosnodejs.nh;
     const beforeAdvertise = Date.now();
-    const pub = nh.advertise('/cmd_vel', 'geometry_msgs/Twist');
+    const pub = nh.advertise(
+      process.env.JoystickTopic,
+      process.env.JoystickType
+    );
     const afterAdvertise = Date.now();
     // console.log('Advetise Difference', afterAdvertise-beforeAdvertise );
 
@@ -124,48 +131,51 @@ exports.robotStatus = (req, res) => {
 
 exports.saveMap = async (req, res, next) => {
   try {
-    await rosnodejs.initNode('/my_node');
+    await rosnodejs.initNode(process.env.ROSNODE);
     const nh = rosnodejs.nh;
-    const sub = nh.subscribe('/map', 'nav_msgs/OccupancyGrid', async (msg) => {
-      const width = msg.info.width;
-      const height = msg.info.height;
-      const image = new Jimp(width, height);
+    const sub = nh.subscribe(
+      process.env.MapTopic,
+      process.env.MapTopicType,
+      async (msg) => {
+        const width = msg.info.width;
+        const height = msg.info.height;
+        const image = new Jimp(width, height);
 
-      for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-          const index = y * width + x;
-          const value = msg.data[index];
-          const invertedValue = value === 0 ? 255 : 0;
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const index = y * width + x;
+            const value = msg.data[index];
+            const invertedValue = value === 0 ? 255 : 0;
 
-          image.setPixelColor(
-            Jimp.rgbaToInt(invertedValue, invertedValue, invertedValue, 255),
-            x,
-            y
-          );
+            image.setPixelColor(
+              Jimp.rgbaToInt(invertedValue, invertedValue, invertedValue, 255),
+              x,
+              y
+            );
+          }
         }
-      }
-      image.rotate(180);
-      image.mirror(true, false);
-      image.write(`images/map.jpg`);
-      nh.unsubscribe('/map');
+        image.rotate(180);
+        image.mirror(true, false);
+        image.write(`images/map.jpg`);
+        nh.unsubscribe('/map');
 
-      // rosnodejs.shutdown();
-      const ipAddress = ip.address();
-      const imageURL = `${req.protocol}://${ipAddress}:5050/map.jpg`;
-      const newPicture = new imageModel({
-        path: 'images/map.jpg',
-        type: 'map',
-        Date: Date.now(),
-        link: imageURL,
-      });
-      const object = {
-        Message: 'Image has been sent uploaded successfully',
-        link: imageURL,
-      };
-      // saveMapObject = object;
-      await newPicture.save();
-      res.status(200).json({ object });
-    });
+        const ipAddress = ip.address();
+        const imageURL = `${req.protocol}://${ipAddress}:5050/map.jpg`;
+        const newPicture = new imageModel({
+          path: 'images/map.jpg',
+          type: 'map',
+          Date: Date.now(),
+          link: imageURL,
+        });
+        const object = {
+          Status: 'success',
+          Message: 'Image has been sent uploaded successfully',
+          link: imageURL,
+        };
+        await newPicture.save();
+        res.status(200).json({ object });
+      }
+    );
   } catch (err) {
     res.status(200).json({ err });
     console.log(err);

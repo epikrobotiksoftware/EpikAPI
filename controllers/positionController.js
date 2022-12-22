@@ -90,11 +90,11 @@ exports.sendGoal = async (req, res) => {
   };
   //   request.marker_name = marker.name;
 
-  rosnodejs.initNode('/my_node').then(() => {
+  rosnodejs.initNode(process.env.ROSNODE).then(() => {
     const nh = rosnodejs.nh;
     const client = nh.serviceClient(
-      '/PositionMarkerNavigate',
-      'mir_navigation/PositionMarkerNavigate'
+      process.env.ServiceClientName,
+      process.env.ServiceClientType
     );
     client.call(request);
     res.status(200).json({
