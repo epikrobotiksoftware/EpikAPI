@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon server.js",
-    "pm2":"pm2 start server.js"
+    "start-pm":"pm2 start server.js",
+    "stop-pm":"pm2 stop server.js"
+
   },
   "author": "Arsalan Rehman",
   "license": "ISC",
