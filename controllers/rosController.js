@@ -184,12 +184,16 @@ exports.saveMap = async (req, res, next) => {
         await newPicture.save();
 
         // Return the response to the client
-        const object = {
+        // const object = {
+        //   Status: 'success',
+        //   Message: 'Image has been sent uploaded successfully',
+        //   link: imageURL,
+        // };
+        res.status(200).json({
           Status: 'success',
           Message: 'Image has been sent uploaded successfully',
           link: imageURL,
-        };
-        res.status(200).json({ object });
+        });
       }
     );
   } catch (err) {
