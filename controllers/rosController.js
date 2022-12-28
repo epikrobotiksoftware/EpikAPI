@@ -131,22 +131,24 @@ exports.robotStatus = (req, res) => {
 
 exports.saveMap = async (req, res, next) => {
   try {
+    // Initialize the ROS node
     await rosnodejs.initNode(process.env.ROSNODE);
     const nh = rosnodejs.nh;
+
+    // Subscribe to the map topic and process the incoming message
     const sub = nh.subscribe(
       process.env.MapTopic,
       process.env.MapTopicType,
       async (msg) => {
+        // Convert the occupancy grid message into an image
         const width = msg.info.width;
         const height = msg.info.height;
         const image = new Jimp(width, height);
-
         for (let y = 0; y < height; y++) {
           for (let x = 0; x < width; x++) {
             const index = y * width + x;
             const value = msg.data[index];
             const invertedValue = value === 0 ? 255 : 0;
-
             image.setPixelColor(
               Jimp.rgbaToInt(invertedValue, invertedValue, invertedValue, 255),
               x,
@@ -159,20 +161,34 @@ exports.saveMap = async (req, res, next) => {
         image.write(`images/map.jpg`);
         nh.unsubscribe('/map');
 
+        // Generate the image URL and check if it already exists in the database
         const ipAddress = ip.address();
         const imageURL = `${req.protocol}://${ipAddress}:5050/map.jpg`;
+        const existingImage = await imageModel.findOne({ link: imageURL });
+        if (existingImage) {
+          console.log('Image URL already exists in the database');
+          res.status(200).json({
+            Message: 'Image URL already exists in the database',
+            link: imageURL,
+          });
+          return;
+        }
+
+        // If the image URL does not exist in the database, save the new image
         const newPicture = new imageModel({
           path: 'images/map.jpg',
           type: 'map',
           Date: Date.now(),
           link: imageURL,
         });
+        await newPicture.save();
+
+        // Return the response to the client
         const object = {
           Status: 'success',
           Message: 'Image has been sent uploaded successfully',
           link: imageURL,
         };
-        await newPicture.save();
         res.status(200).json({ object });
       }
     );
