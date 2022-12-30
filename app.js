@@ -11,12 +11,12 @@ app.use(express.json());
 const cors = require('cors');
 const rosRouter = require('./routers/rosRouter');
 const imageRoute = require('./routers/imageRouter');
+var ip = require('ip');
+const ipAddress = ip.address();
 //////////////////
 
 app.get(helmet());
 
-// app.get(cors());
-// port = [3000,3001,3002,3003,3004]
 const corsOptions = {
   origin: [
     'http://localhost:3000',
@@ -24,6 +24,12 @@ const corsOptions = {
     'http://localhost:3002',
     'http://localhost:3003',
     'http://localhost:3004',
+    `http://${ipAddress}:3000`,
+    `http://${ipAddress}:3001`,
+    `http://${ipAddress}:3002`,
+    `http://${ipAddress}:3003`,
+    `http://${ipAddress}:3004`,
+    `http://${ipAddress}:3005`,
   ],
   credentials: true, //access-control-allow-credentials:true
   optionSuccessStatus: 200,

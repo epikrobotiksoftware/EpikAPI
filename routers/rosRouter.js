@@ -40,4 +40,5 @@ router
 
 router.post('/sendGoal/:id', positionController.sendGoal);
 router.get('/saveMap', rosController.saveMap);
+router.get('/startServices', rosController.startServices);
 module.exports = router;

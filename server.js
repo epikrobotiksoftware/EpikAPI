@@ -3,7 +3,8 @@ const dotenv = require('dotenv');
 dotenv.config({ path: './config.env' });
 const app = require('./app');
 const cors = require('cors');
-
+const rosController = require('./controllers/rosController');
+rosController.startServices();
 app.get(cors());
 
 // const DB = process.env.DATABASE.replace('<PASSWORD>',
