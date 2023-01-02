@@ -9,6 +9,7 @@ const { spawnSync } = require('child_process');
 
 //listening  to the robotState topic
 var lastestStatusMsg = {};
+let child;
 rosnodejs.initNode(process.env.ROSNODE).then(() => {
   const nh = rosnodejs.nh;
   const sub = nh.subscribe(
@@ -203,52 +204,41 @@ exports.saveMap = async (req, res, next) => {
     console.log(err);
   }
 };
-exports.startServices = () => {
-  // roscore
-  const roscore = spawnSync('pgrep', ['roscore']);
-
-  if (roscore.status === 0) {
-    console.log('roscore is already running');
-  } else {
-    console.log('roscore is not running, starting it now');
-    spawn('roscore', { shell: true });
-  }
-  // mongod
-  const mongod = spawnSync('pgrep', ['mongod']);
-
-  if (mongod.status === 0) {
-    console.log('mongod is already running');
-  } else {
-    console.log('mongod is not running, starting it now');
-    spawn('roscore', { shell: true });
-  }
-  // start map
-  const start_map = spawnSync('pgrep', ['roslaunch']);
-
-  if (start_map.status === 0) {
-    console.log('roslaunch is already running');
-  } else {
-    console.log('roslaunch is not running, starting it now');
-    spawn('roslaunch', ['mir_simulation', 'start_map.launch'], {
+exports.startServices = async (req, res) => {
+  try {
+    // start map
+    child = spawn('roslaunch', ['mir_simulation', 'start_map.launch'], {
       shell: true,
       detached: true,
     });
+    console.log(`Started roslaunch with PID: ${child.pid}`);
+    res.status(200).json({
+      Message: `Services started successfully`,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error });
   }
-  //Robot Publish
-  const robot_publish = spawnSync('pgrep', ['rosrun']);
+};
+exports.stopServices = async (req, res) => {
+  try {
+    // Find the name of the node that was created by the roslaunch command
+    const output = spawnSync('rosnode', ['list']);
+    const nodes = output.stdout.toString().split('\n');
+    const mapNode = nodes.find((node) => node.startsWith('/static_map_server'));
+    const rvizNode = nodes.find((node) => node.startsWith('/rviz'));
 
-  if (robot_publish.status === 0) {
-    console.log('rosrun is already running');
-  } else {
-    console.log('rosrun is not running, starting it now');
-    spawn('rosrun', ['robot', 'publish_robot_state.py'], {
-      shell: true,
-      detached: true,
+    if (mapNode) {
+      // Kill the node
+      spawn('rosnode', ['kill', mapNode, rvizNode], { shell: true });
+    }
+    res.status(200).json({
+      Message: `nodes have been killed successfully`,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(200).json({
+      error,
     });
   }
-  // WebSocket
-  spawn('roslaunch', ['rosbridge_server', 'rosbridge_websocket.launch'], {
-    shell: true,
-    detached: true,
-  });
 };

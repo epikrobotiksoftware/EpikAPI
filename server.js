@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 dotenv.config({ path: './config.env' });
+const { spawn } = require('child_process');
 const app = require('./app');
 const cors = require('cors');
 const rosController = require('./controllers/rosController');
-rosController.startServices();
+// rosController.startServices();
 app.get(cors());
 
 // const DB = process.env.DATABASE.replace('<PASSWORD>',
