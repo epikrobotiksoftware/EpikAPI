@@ -81,7 +81,6 @@ exports.sendGoal = async (req, res) => {
       z: 0,
     },
     orientation: {
-      // here
       w: rotationROS.w,
       x: rotationROS.x,
       y: rotationROS.y,

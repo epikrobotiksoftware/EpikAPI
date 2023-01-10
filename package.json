@@ -5,9 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon server.js",
-    "start-pm":"pm2 start server.js",
-    "stop-pm":"pm2 stop server.js"
-
+    "start-pm": "pm2 start server.js",
+    "stop-pm": "pm2 stop server.js"
   },
   "author": "Arsalan Rehman",
   "license": "ISC",
@@ -37,6 +36,7 @@
     "rosnodejs": "^3.1.0",
     "slugify": "^1.6.5",
     "stripe": "^10.3.0",
+    "tty": "^1.0.1",
     "util": "^0.12.4",
     "validator": "^13.7.0"
   }

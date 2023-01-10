@@ -13,6 +13,7 @@ const rosRouter = require('./routers/rosRouter');
 const imageRoute = require('./routers/imageRouter');
 var ip = require('ip');
 const ipAddress = ip.address();
+const mapRouter = require('./routers/mapRouter');
 //////////////////
 
 app.get(helmet());
@@ -49,6 +50,7 @@ if (process.env.NODE_ENV === 'development') {
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/ros', rosRouter);
 app.use('/api/v1/images', imageRoute);
+app.use('/api/v1/map', mapRouter);
 app.use(express.static('images'));
 
 app.all('*', (req, res, next) => {

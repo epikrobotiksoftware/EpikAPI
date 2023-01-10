@@ -39,8 +39,5 @@ router
   .delete(positionController.deletePositionMarker);
 
 router.post('/sendGoal/:id', positionController.sendGoal);
-router.get('/saveMap', rosController.saveMap);
-router.get('/startServices', rosController.startServices);
-router.get('/stopServices', rosController.stopServices);
 
 module.exports = router;

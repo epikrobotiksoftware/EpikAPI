@@ -11,7 +11,6 @@ roslaunch rosbridge_server rosbridge_websocket.launch &
 
 rosrun robot publish_robot_state.py &
 
-roslaunch mir_simulation start_services.launch &
 
 # Wait for any background process to terminate
 wait
