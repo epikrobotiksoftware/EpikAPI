@@ -164,3 +164,6 @@ exports.pauseMap = async (req, res) => {
     console.log('Error while calling the service: ', err);
   }
 };
+exports.downloadMap = (req, res) => {
+  res.download('images/map.jpg');
+};

@@ -59,6 +59,4 @@ exports.uploadImage = async (req, res) => {
 exports.getImage = (req, res) => {
   res.download('upload/' + req.params.path);
 };
-exports.downloadMap = (req, res) => {
-  res.download('images/map.jpg');
-};
+

@@ -12,7 +12,7 @@ const upload = multer({
 
 const router = express.Router();
 router.get('/getImage/:path', imageController.getImage);
-router.get('/downloadMap', imageController.downloadMap);
+// router.get('/downloadMap', imageController.downloadMap);
 
 router.post(
   '/uploadImage',
