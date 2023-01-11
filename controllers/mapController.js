@@ -3,6 +3,7 @@ const Jimp = require('jimp');
 const imageModel = require('../models/imageModel');
 var ip = require('ip');
 const rosnodejs = require('rosnodejs');
+const { Decimal128 } = require('mongodb');
 const SetBool = rosnodejs.require('std_srvs').srv.SetBool;
 
 exports.getMap = async (req, res, next) => {
@@ -80,11 +81,25 @@ exports.getMap = async (req, res, next) => {
 
 exports.startMap = async (req, res) => {
   try {
+    let width = Number(req.body.width);
+    let height = Number(req.body.height);
+    let resolution = Number(req.body.resolution);
+    let max = width > height ? width : height;
+    // console.log(max);
+    let mapCommand = `map_size:=${max / resolution}`;
+    // console.log(mapCommand);
+    let resolutionCommand = `map_resolution:=${resolution}`;
+    // console.log(resolutionCommand);
+
     // start map
-    child = spawn('roslaunch', ['mir_navigation', 'start_mapping.launch'], {
-      shell: true,
-      detached: true,
-    });
+    child = spawn(
+      'roslaunch',
+      ['mir_navigation', 'start_mapping.launch', mapCommand, resolutionCommand],
+      {
+        shell: true,
+        detached: true,
+      }
+    );
     console.log(`Started roslaunch with PID: ${child.pid}`);
     latestValue = child;
     res.status(200).json({
@@ -148,6 +163,7 @@ exports.saveMap = async (req, res) => {
 
 exports.pauseMap = async (req, res) => {
   try {
+    console.log('SELCUKYILMAZ', req.body);
     const stat = req.body.stat;
     await rosnodejs.initNode(process.env.ROSNODE);
     const nh = rosnodejs.nh;
