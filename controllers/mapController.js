@@ -3,6 +3,7 @@ const Jimp = require('jimp');
 const imageModel = require('../models/imageModel');
 var ip = require('ip');
 const rosnodejs = require('rosnodejs');
+const SetBool = rosnodejs.require('std_srvs').srv.SetBool;
 
 exports.getMap = async (req, res, next) => {
   try {
@@ -147,23 +148,33 @@ exports.saveMap = async (req, res) => {
 
 exports.pauseMap = async (req, res) => {
   try {
+    const stat = req.body.stat;
     await rosnodejs.initNode(process.env.ROSNODE);
     const nh = rosnodejs.nh;
-    const client = nh.serviceClient(
+    const client = await nh.serviceClient(
       process.env.PauseMapSrvName,
       process.env.PauseMapSrvType
     );
-    data = req.body.data;
-    client.call({ data: data });
+    const requestPause = new SetBool.Request();
+    if (stat === 'true') {
+      requestPause.data = true;
+      await client.call(requestPause);
+    }
+    if (stat === 'false') {
+      requestPause.data = false;
+      await client.call(requestPause);
+    }
+    console.log(requestPause);
     res.status(200).json({
       status: 'success',
-      data,
+      data: requestPause.data,
     });
     console.log('Service call successfull');
   } catch (err) {
     console.log('Error while calling the service: ', err);
   }
 };
+
 exports.downloadMap = (req, res) => {
   res.download('images/map.jpg');
 };
