@@ -84,6 +84,7 @@ exports.startMap = async (req, res) => {
     let width = Number(req.body.width);
     let height = Number(req.body.height);
     let resolution = Number(req.body.resolution);
+    console.log(`width : ${width} h: ${height} r: ${resolution}`);
     let max = width > height ? width : height;
     // console.log(max);
     let mapCommand = `map_size:=${max / resolution}`;
