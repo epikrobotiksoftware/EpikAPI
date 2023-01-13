@@ -3,8 +3,8 @@ const Jimp = require('jimp');
 const imageModel = require('../models/imageModel');
 var ip = require('ip');
 const rosnodejs = require('rosnodejs');
-const { Decimal128 } = require('mongodb');
 const SetBool = rosnodejs.require('std_srvs').srv.SetBool;
+var mapState = 'unactive';
 
 exports.getMap = async (req, res, next) => {
   try {
@@ -73,6 +73,7 @@ exports.getMap = async (req, res, next) => {
         });
       }
     );
+    mapState = 'gettingMap';
   } catch (err) {
     res.status(200).json({ err });
     console.log(err);
@@ -106,6 +107,7 @@ exports.startMap = async (req, res) => {
     res.status(200).json({
       Message: `Services started successfully`,
     });
+    mapState = 'startingMap';
   } catch (error) {
     console.log(error);
     res.status(500).json({ error });
@@ -116,18 +118,24 @@ exports.stopMap = async (req, res) => {
     // Find the name of the nodes that were created by the roslaunch command
     const output = spawnSync('rosnode', ['list']);
     const nodes = output.stdout.toString().split('\n');
-    const nodesToKill = nodes.filter((node) =>
-      node.startsWith('/hector_mapping')
+    const nodesToKill = nodes.filter(
+      (node) => node.startsWith('/hector_mapping')
+      // node.startsWith('/rviz') ||
+      // node.startsWith('/rqt_robot_steering')
     );
     if (nodesToKill.length) {
       // Kill the nodes
       spawn('rosnode', ['kill', ...nodesToKill], {
         shell: true,
       });
+      // spawn('killall', ['gzserver', 'gzclient'], {
+      //   shell: true,
+      // });
     }
     res.status(200).json({
       Message: `nodes have been killed successfully`,
     });
+    mapState = 'mapStoped';
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -153,6 +161,7 @@ exports.saveMap = async (req, res) => {
       status: 'success',
       message: 'map_server executed successfully',
     });
+    mapState = 'saved';
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -176,10 +185,12 @@ exports.pauseMap = async (req, res) => {
     if (stat === 'true') {
       requestPause.data = true;
       await client.call(requestPause);
+      mapState = 'paused';
     }
     if (stat === 'false') {
       requestPause.data = false;
       await client.call(requestPause);
+      mapState = 'resumed';
     }
     console.log(requestPause);
     res.status(200).json({
@@ -194,4 +205,17 @@ exports.pauseMap = async (req, res) => {
 
 exports.downloadMap = (req, res) => {
   res.download('images/map.jpg');
+  mapState = 'MapDownloaded';
+};
+exports.mapStatus = (req, res) => {
+  try {
+    res.status(200).json({
+      mapState,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      err,
+    });
+  }
 };

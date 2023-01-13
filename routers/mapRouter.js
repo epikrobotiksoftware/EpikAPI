@@ -8,5 +8,6 @@ router.get('/stopMap', mapController.stopMap);
 router.get('/saveMap', mapController.saveMap);
 router.post('/pauseMap', mapController.pauseMap);
 router.get('/downloadMap', mapController.downloadMap);
+router.get('/mapStatus', mapController.mapStatus);
 
 module.exports = router;
