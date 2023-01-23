@@ -17,6 +17,16 @@ const mapRouter = require('./routers/mapRouter');
 //////////////////
 
 app.get(helmet());
+/* 
+const localIp = ip.address();
+const corsOptions = {
+  origin: [
+    new RegExp(`^http://${localIp}:\\d+$`)
+  ],
+  credentials: true,
+  optionSuccessStatus: 200,
+};
+*/ 
 
 const corsOptions = {
   origin: [

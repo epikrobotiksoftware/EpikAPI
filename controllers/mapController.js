@@ -131,6 +131,15 @@ exports.stopMap = async (req, res) => {
       // spawn('killall', ['gzserver', 'gzclient'], {
       //   shell: true,
       // });
+      spawn(
+        'rosrun',
+        [
+          'map_server',
+          'map_server',
+          '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.yaml',
+        ],
+        { shell: true }
+      );
     }
     res.status(200).json({
       Message: `nodes have been killed successfully`,
@@ -153,7 +162,7 @@ exports.saveMap = async (req, res) => {
         'map_server',
         'map_saver',
         '-f',
-        '~/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.yaml',
+        '~/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map',
       ],
       { shell: true }
     );
