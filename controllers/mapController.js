@@ -82,6 +82,14 @@ exports.getMap = async (req, res, next) => {
 
 exports.startMap = async (req, res) => {
   try {
+    const output = spawnSync('rosnode', ['list']);
+    const nodes = output.stdout.toString().split('\n');
+    // console.log(nodes);
+    const nodesToKill = nodes.filter((node) => node.startsWith('/map_server'));
+    console.log(nodesToKill);
+    if (nodesToKill.length) {
+      spawn('rosnode', ['kill', ...nodesToKill]);
+    }
     let width = Number(req.body.width);
     let height = Number(req.body.height);
     let resolution = Number(req.body.resolution);
@@ -96,7 +104,12 @@ exports.startMap = async (req, res) => {
     // start map
     child = spawn(
       'roslaunch',
-      ['mir_navigation', 'start_mapping.launch', mapCommand, resolutionCommand],
+      [
+        'mir_navigation',
+        'hector_mapping.launch',
+        mapCommand,
+        resolutionCommand,
+      ],
       {
         shell: true,
         detached: true,
@@ -132,11 +145,13 @@ exports.stopMap = async (req, res) => {
       //   shell: true,
       // });
       spawn(
-        'rosrun',
+        'xterm',
         [
+          '-e',
+          'rosrun',
           'map_server',
           'map_server',
-          '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.yaml',
+          '/home/kail/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.yaml',
         ],
         { shell: true }
       );
