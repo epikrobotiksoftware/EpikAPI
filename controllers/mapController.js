@@ -5,6 +5,11 @@ var ip = require('ip');
 const rosnodejs = require('rosnodejs');
 const SetBool = rosnodejs.require('std_srvs').srv.SetBool;
 var mapState = 'unactive';
+spawn('rosrun', [
+  'map_server',
+  'map_server',
+  '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.yaml',
+]);
 
 exports.getMap = async (req, res, next) => {
   try {
@@ -145,10 +150,10 @@ exports.stopMap = async (req, res) => {
       //   shell: true,
       // });
       spawn(
-        'xterm',
+        'rosrun',
         [
-          '-e',
-          'rosrun',
+          // '-e',
+          // 'rosrun',
           'map_server',
           'map_server',
           '/home/kail/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.yaml',
