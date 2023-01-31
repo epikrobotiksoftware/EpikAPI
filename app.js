@@ -63,6 +63,7 @@ app.use('/api/v1/images', imageRoute);
 app.use('/api/v1/map', mapRouter);
 app.use(express.static('images'));
 
+
 app.all('*', (req, res, next) => {
   next(new AppError(`${req.originalUrl} bulunmamaktadir`, 404));
 });

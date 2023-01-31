@@ -5,11 +5,8 @@ var ip = require('ip');
 const rosnodejs = require('rosnodejs');
 const SetBool = rosnodejs.require('std_srvs').srv.SetBool;
 var mapState = 'unactive';
-spawn('rosrun', [
-  'map_server',
-  'map_server',
-  '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.yaml',
-]);
+spawn('rosrun', ['map_server', 'map_server', process.env.MAP_PATH]);
+// console.log(process.env.MAP_PATH);
 
 exports.getMap = async (req, res, next) => {
   try {
@@ -156,7 +153,7 @@ exports.stopMap = async (req, res) => {
           // 'rosrun',
           'map_server',
           'map_server',
-          '/home/kail/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.yaml',
+          process.env.MAP_PATH,
         ],
         { shell: true }
       );
@@ -202,7 +199,6 @@ exports.saveMap = async (req, res) => {
 
 exports.pauseMap = async (req, res) => {
   try {
-    console.log('SELCUKYILMAZ', req.body);
     const stat = req.body.stat;
     await rosnodejs.initNode(process.env.ROSNODE);
     const nh = rosnodejs.nh;
@@ -244,6 +240,31 @@ exports.mapStatus = (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({
+      err,
+    });
+  }
+};
+exports.mapRefresh = async (req, res) => {
+  try {
+    spawnSync(
+      'cp',
+      [
+        // '-e',
+        // 'cp',
+        '-r',
+        '~/catkin_ws/src/js_pkg/upload/map.jpg',
+        '~/catkin_ws/src/mir_robot/mir_gazebo/maps/',
+      ],
+      { shell: true }
+    );
+    spawn('rosrun', ['map_server', 'map_server', process.env.MAP_PATH]);
+    mapState = 'MapRefreshed';
+    res.status(200).json({
+      message: 'refreshed',
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(200).json({
       err,
     });
   }
