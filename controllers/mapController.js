@@ -4,6 +4,7 @@ const imageModel = require('../models/imageModel');
 var ip = require('ip');
 const rosnodejs = require('rosnodejs');
 const SetBool = rosnodejs.require('std_srvs').srv.SetBool;
+const fs = require('fs');
 var mapState = 'unactive';
 spawn('rosrun', ['map_server', 'map_server', process.env.MAP_PATH]);
 // console.log(process.env.MAP_PATH);
@@ -244,7 +245,7 @@ exports.mapStatus = (req, res) => {
     });
   }
 };
-exports.mapRefresh = async (req, res) => {
+exports.mapUpdate = async (req, res) => {
   try {
     spawnSync(
       'cp',
@@ -257,15 +258,32 @@ exports.mapRefresh = async (req, res) => {
       ],
       { shell: true }
     );
-    spawn('rosrun', ['map_server', 'map_server', process.env.MAP_PATH]);
-    mapState = 'MapRefreshed';
-    res.status(200).json({
-      message: 'refreshed',
+    spawn('rosrun', ['map_server', 'map_server', process.env.MAP_PATH], {
+      shell: true,
     });
+    mapState = 'MapUpdated';
+    console.log('updated');
+    // res.status(200).json({
+    //   message: 'refreshed',
+    // });
+    console.log('mapUpdated');
   } catch (err) {
     console.log(err);
     res.status(200).json({
       err,
     });
   }
+};
+exports.mapConvert = async (req, res) => {
+  const base64Data = req.body.image.replace(/^data:image\/[a-z]+;base64,/, '');
+  const imageType = req.body.image.match(/^data:image\/([a-z]+);base64,/)[1];
+  const filePath = `./images/convertedImage.${imageType}`;
+
+  fs.writeFile(filePath, base64Data, 'base64', (err) => {
+    if (err) {
+      return res.status(500).send({ error: err });
+    }
+
+    res.status(200).send({ message: 'Image saved successfully' });
+  });
 };

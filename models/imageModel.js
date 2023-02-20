@@ -9,7 +9,6 @@ const imageModel = mongoose.Schema({
   },
   link: {
     type: String,
-    unique: true,
   },
   Date: Date,
 });

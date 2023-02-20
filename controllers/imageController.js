@@ -1,5 +1,7 @@
 const multer = require('multer');
 const imageModel = require('../models/imageModel');
+const fs = require('fs');
+const mapController = require('./mapController');
 
 exports.storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -22,9 +24,12 @@ exports.fileFilter = (req, file, cb) => {
 exports.uploadImage = async (req, res) => {
   try {
     image = req.file;
+    const filename = `map.${image.mimetype.split('/')[1]}`;
+    console.log(filename);
+
     const ImageURL = `${req.protocol}://${req.get(
       'host'
-    )}/api/v1/images/getImage/${image.filename}`;
+    )}/api/v1/images/getImage/${filename}`;
     // console.log('Image URL',ImageURL);
 
     const newPicture = new imageModel({
@@ -43,6 +48,9 @@ exports.uploadImage = async (req, res) => {
       });
 
     console.log(image);
+    fs.renameSync(`./upload/${image.filename}`, `./upload/${filename}`);
+    mapController.mapUpdate();
+    console.log('image name changed');
     res.status(200).json({
       status: 'success',
       message: 'Image has been uploaded inside server',
@@ -59,4 +67,3 @@ exports.uploadImage = async (req, res) => {
 exports.getImage = (req, res) => {
   res.download('upload/' + req.params.path);
 };
-

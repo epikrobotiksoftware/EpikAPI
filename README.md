@@ -12,3 +12,8 @@ roslaunch for_arslan start.launch
 
 -- To start map services
 roslaunch mir_simulation start_map.launch
+
+--To start the API in production mode run
+npm run start-pm
+--To stop the API in production mode run
+npm run stop-pm
