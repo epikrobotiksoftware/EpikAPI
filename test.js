@@ -1,0 +1,65 @@
+// const Jimp = require('jimp');
+
+// Jimp.read('./images/map.jpg').then((image) => {
+//   image.quality(60).greyscale().write('./images/image.pgm');
+// });
+
+/////////////////////////////////////////////////////////////////////////////
+// const fs = require('fs');
+// const Jimp = require('jimp');
+// const inputPath = './images/map.jpg';
+// const outputPath = './images/newMap.pgm';
+// async function savePGM(inputPath, outputPath) {
+//   const image = await Jimp.read(inputPath);
+
+//   const width = image.bitmap.width;
+//   const height = image.bitmap.height;
+
+//   let data = 'P2\n';
+//   data += `${width} ${height}\n`;
+//   data += '255\n';
+
+//   for (let y = 0; y < height; y++) {
+//     for (let x = 0; x < width; x++) {
+//       const color = Jimp.intToRGBA(image.getPixelColor(x, y));
+//       const intensity = Math.round(
+//         0.2989 * color.r + 0.587 * color.g + 0.114 * color.b
+//       );
+//       data += `${intensity} `;
+//     }
+//     data += '\n';
+//   }
+
+//   fs.writeFileSync(outputPath, data);
+// }
+
+// savePGM('./images/map.jpg', './images/newMap.pgm');
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const fs = require('fs');
+
+// Read the file
+fs.readFile(
+  '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.yaml',
+  'utf8',
+  (err, data) => {
+    if (err) throw err;
+
+    // Replace the text
+    let newData = data.replace(
+      '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.pgm',
+      '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/map.pgm'
+    );
+
+    // Write the file
+    fs.writeFile(
+      '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.yaml',
+
+      newData,
+      (err) => {
+        if (err) throw err;
+        console.log('File updated');
+      }
+    );
+  }
+);

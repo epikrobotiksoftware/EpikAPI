@@ -275,8 +275,8 @@ exports.mapUpdate = async (req, res) => {
   }
 };
 exports.mapConvert = async (req, res) => {
-  const base64Data = req.body.image.replace(/^data:image\/[a-z]+;base64,/, '');
-  const imageType = req.body.image.match(/^data:image\/([a-z]+);base64,/)[1];
+  const base64Data = req.body.imageBase64.replace(/^data:image\/[a-z]+;base64,/, '');
+  const imageType = req.body.imageBase64.match(/^data:image\/([a-z]+);base64,/)[1];
   const filePath = `./images/convertedImage.${imageType}`;
 
   fs.writeFile(filePath, base64Data, 'base64', (err) => {
