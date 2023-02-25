@@ -63,6 +63,10 @@ exports.getMap = async (req, res, next) => {
         });
         await newPicture.save();
 
+        const imageData = fs.readFileSync('../images/map.jpg');
+        const base64Image = imageData.toString('base64');
+        console.log(base64Image);
+
         // Return the response to the client
         // const object = {
         //   Status: 'success',
@@ -73,6 +77,7 @@ exports.getMap = async (req, res, next) => {
           Status: 'success',
           Message: 'Image has been sent uploaded successfully',
           link: imageURL,
+          base64: base64Image,
         });
       }
     );
@@ -275,8 +280,13 @@ exports.mapUpdate = async (req, res) => {
   }
 };
 exports.mapConvert = async (req, res) => {
-  const base64Data = req.body.imageBase64.replace(/^data:image\/[a-z]+;base64,/, '');
-  const imageType = req.body.imageBase64.match(/^data:image\/([a-z]+);base64,/)[1];
+  const base64Data = req.body.imageBase64.replace(
+    /^data:image\/[a-z]+;base64,/,
+    ''
+  );
+  const imageType = req.body.imageBase64.match(
+    /^data:image\/([a-z]+);base64,/
+  )[1];
   const filePath = `./images/convertedImage.${imageType}`;
 
   fs.writeFile(filePath, base64Data, 'base64', (err) => {
