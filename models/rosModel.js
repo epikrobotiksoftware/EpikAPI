@@ -28,5 +28,37 @@ const positionMarker = mongoose.Schema({
     required: [false, ' Optional'],
   },
 });
-Position = mongoose.model('Position', positionMarker);
-module.exports = Position;
+
+const action = mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, 'Action must have a Name'],
+      unique: true,
+    },
+    type: {
+      type: String,
+      // default: 'normal',
+      enum: ['load', 'unload', 'charge', 'removeCharge', 'goto'],
+      required: [true, ' Action must have a type'],
+    },
+  },
+  { collection: 'actions' }
+);
+
+const mission = mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, 'Action must have a Name'],
+      unique: true,
+    },
+    mission: mongoose.Schema.Types.Mixed,
+  },
+  { collection: 'missions' }
+);
+const Position = mongoose.model('Position', positionMarker);
+const Action = mongoose.model('Action', action);
+const Mission = mongoose.model('Mission', mission);
+
+module.exports = { Position, Action, Mission };

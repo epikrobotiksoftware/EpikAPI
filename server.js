@@ -9,7 +9,7 @@ app.get(cors());
 //   process.env.DATABASE_PASSWORD);
 
 const DB = 'mongodb://localhost:27017';
-
+mongoose.set('strictQuery', true);
 mongoose
   .connect(DB, {
     useNewUrlParser: true,
