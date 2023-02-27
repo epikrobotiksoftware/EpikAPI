@@ -45,11 +45,16 @@ exports.getMap = async (req, res, next) => {
         const ipAddress = ip.address();
         const imageURL = `${req.protocol}://${ipAddress}:5050/map.jpg`;
         const existingImage = await imageModel.findOne({ link: imageURL });
+        const imageData = fs.readFileSync('images/map.jpg');
+        const base64Image = imageData.toString('base64');
+        // console.log(base64Image);
+        // fs.writeFileSync('images/base64.txt', base64Image);
         if (existingImage) {
           console.log('Image URL already exists in the database');
           res.status(200).json({
             Message: 'Image URL already exists in the database',
             link: imageURL,
+            base64: `data:image/jpeg;base64,${base64Image}`,
           });
           return;
         }
@@ -63,10 +68,6 @@ exports.getMap = async (req, res, next) => {
         });
         await newPicture.save();
 
-        const imageData = fs.readFileSync('../images/map.jpg');
-        const base64Image = imageData.toString('base64');
-        console.log(base64Image);
-
         // Return the response to the client
         // const object = {
         //   Status: 'success',
@@ -77,7 +78,7 @@ exports.getMap = async (req, res, next) => {
           Status: 'success',
           Message: 'Image has been sent uploaded successfully',
           link: imageURL,
-          base64: base64Image,
+          base64: `data:image/jpeg;base64,${base64Image}`,
         });
       }
     );
