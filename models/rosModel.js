@@ -42,6 +42,18 @@ const action = mongoose.Schema(
       enum: ['load', 'unload', 'charge', 'removeCharge', 'goto'],
       required: [true, ' Action must have a type'],
     },
+    x: {
+      type: Number,
+      required: function () {
+        return this.type === 'goto';
+      },
+    },
+    y: {
+      type: Number,
+      required: function () {
+        return this.type === 'goto';
+      },
+    },
   },
   { collection: 'actions' }
 );
@@ -50,7 +62,7 @@ const mission = mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Action must have a Name'],
+      required: [true, 'Mission must have a Name'],
       unique: true,
     },
     mission: mongoose.Schema.Types.Mixed,

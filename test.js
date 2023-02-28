@@ -39,27 +39,49 @@
 const fs = require('fs');
 
 // Read the file
-fs.readFile(
-  '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.yaml',
-  'utf8',
-  (err, data) => {
-    if (err) throw err;
+// fs.readFile(
+//   '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.yaml',
+//   'utf8',
+//   (err, data) => {
+//     if (err) throw err;
 
-    // Replace the text
-    let newData = data.replace(
-      '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.pgm',
-      '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/map.pgm'
-    );
+//     // Replace the text
+//     let newData = data.replace(
+//       '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.pgm',
+//       '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/map.pgm'
+//     );
 
-    // Write the file
-    fs.writeFile(
-      '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.yaml',
+//     // Write the file
+//     fs.writeFile(
+//       '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.yaml',
 
-      newData,
-      (err) => {
-        if (err) throw err;
-        console.log('File updated');
-      }
-    );
-  }
-);
+//       newData,
+//       (err) => {
+//         if (err) throw err;
+//         console.log('File updated');
+//       }
+//     );
+//   }
+// );
+/////////////////////////////////////////////////////////////////////////////////////////////
+const Jimp = require('jimp');
+
+// Load the image
+Jimp.read('images/map.jpg')
+  .then((image) => {
+    let degreesToRotate = 90;
+
+    // Convert negative degrees to positive
+    while (degreesToRotate < 0) {
+      degreesToRotate += 360;
+    }
+
+    // Rotate the image
+    image.rotate(degreesToRotate);
+
+    // Save the rotated image
+    return image.writeAsync('images/map.jpg');
+  })
+  .catch((error) => {
+    console.error(error);
+  });
