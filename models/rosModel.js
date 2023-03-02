@@ -42,18 +42,19 @@ const action = mongoose.Schema(
       enum: ['load', 'unload', 'charge', 'removeCharge', 'goto'],
       required: [true, ' Action must have a type'],
     },
-    x: {
-      type: Number,
-      required: function () {
-        return this.type === 'goto';
-      },
-    },
-    y: {
-      type: Number,
-      required: function () {
-        return this.type === 'goto';
-      },
-    },
+    content: mongoose.Schema.Types.Mixed,
+    // x: {
+    //   type: Number,
+    //   required: function () {
+    //     return this.type === 'goto';
+    //   },
+    // },
+    // y: {
+    //   type: Number,
+    //   required: function () {
+    //     return this.type === 'goto';
+    //   },
+    // },
   },
   { collection: 'actions' }
 );
