@@ -9,6 +9,7 @@ const AppError = require('./utils/appError');
 const app = express();
 app.use(express.json());
 const cors = require('cors');
+var bodyParser = require('body-parser');
 const rosRouter = require('./routers/rosRouter');
 const imageRoute = require('./routers/imageRouter');
 var ip = require('ip');
@@ -26,7 +27,26 @@ const corsOptions = {
   credentials: true,
   optionSuccessStatus: 200,
 };
-*/ 
+*/
+// var jsonParser = bodyParser.json({
+//   limit: 1024 * 1024 * 20,
+//   type: 'application/json',
+// });
+// var urlencodedParser = bodyParser.urlencoded({
+//   extended: true,
+//   limit: 1024 * 1024 * 20,
+//   type: 'application/x-www-form-urlencoded',
+// });
+// app.use(jsonParser);
+// app.use(urlencodedParser);
+app.use(bodyParser.json({ limit: '20971520', type: 'application/json' }));
+app.use(
+  bodyParser.urlencoded({
+    limit: '20971520',
+    extended: true,
+    // parameterLimit: 500000000,
+  })
+);
 
 const corsOptions = {
   origin: [
@@ -62,7 +82,6 @@ app.use('/api/v1/ros', rosRouter);
 app.use('/api/v1/images', imageRoute);
 app.use('/api/v1/map', mapRouter);
 app.use(express.static('images'));
-
 
 app.all('*', (req, res, next) => {
   next(new AppError(`${req.originalUrl} bulunmamaktadir`, 404));

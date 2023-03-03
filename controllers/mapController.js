@@ -281,20 +281,26 @@ exports.mapUpdate = async (req, res) => {
   }
 };
 exports.mapConvert = async (req, res) => {
-  const base64Data = req.body.imageBase64.replace(
-    /^data:image\/[a-z]+;base64,/,
-    ''
-  );
-  const imageType = req.body.imageBase64.match(
-    /^data:image\/([a-z]+);base64,/
-  )[1];
-  const filePath = `./images/convertedImage.${imageType}`;
+  try {
+    const base64Data = req.body.imageBase64.replace(
+      /^data:image\/[a-z]+;base64,/,
+      ''
+    );
+    console.log('endpoint triggered');
 
-  fs.writeFile(filePath, base64Data, 'base64', (err) => {
-    if (err) {
-      return res.status(500).send({ error: err });
-    }
+    const imageType = req.body.imageBase64.match(
+      /^data:image\/([a-z]+);base64,/
+    )[1];
+    const filePath = `./images/convertedImage.${imageType}`;
 
-    res.status(200).send({ message: 'Image saved successfully' });
-  });
+    fs.writeFile(filePath, base64Data, 'base64', (err) => {
+      if (err) {
+        return res.status(500).send({ error: err });
+      }
+
+      res.status(200).send({ message: 'Image saved successfully' });
+    });
+  } catch (err) {
+    console.log(err);
+  }
 };
