@@ -286,7 +286,7 @@ exports.mapConvert = async (req, res) => {
       /^data:image\/[a-z]+;base64,/,
       ''
     );
-    console.log('endpoint triggered');
+    // console.log('endpoint triggered');
 
     const imageType = req.body.imageBase64.match(
       /^data:image\/([a-z]+);base64,/
@@ -301,10 +301,20 @@ exports.mapConvert = async (req, res) => {
       res.status(200).send({ message: 'Image saved successfully' });
     });
     // cp -r /home/kali/catkin_ws/src/js_pkg/images/convertedImage.png /home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/
-
-    spawnSync('cp', ['-r', process.env.MAP_IMAGE_PATH, MAP_DESTINATION], {
-      shell: true,
-    });
+    // spawnSync('sleep', ['5'], {
+    //   shell: true,
+    // });
+    spawnSync(
+      'cp',
+      [
+        '-r',
+        `${process.env.MAP_IMAGE_PATH}map.jpg`,
+        process.env.MAP_DESTINATION,
+      ],
+      {
+        shell: true,
+      }
+    );
     fs.readFile(
       '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.yaml',
       'utf8',
@@ -312,10 +322,7 @@ exports.mapConvert = async (req, res) => {
         if (err) throw err;
 
         // Replace the text
-        let newData = data.replace(
-          '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.pgm',
-          '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/convertedImage.png'
-        );
+        let newData = data.replace('my_map.pgm', 'map.jpg');
 
         // Write the file
         fs.writeFile(
@@ -334,8 +341,8 @@ exports.mapConvert = async (req, res) => {
       [
         'mir_navigation',
         'hector_mapping.launch',
-        mapCommand,
-        resolutionCommand,
+        // mapCommand,
+        // resolutionCommand,
       ],
       {
         shell: true,
