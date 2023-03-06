@@ -1,8 +1,8 @@
 const rosnodejs = require('rosnodejs');
 const Position = require('./../models/rosModel');
 const eulerToQte = require('../utils/eulerToQte');
-const PositionMarkerNavigateSrv =
-  rosnodejs.require('mir_navigation').srv.PositionMarkerNavigate;
+// const PositionMarkerNavigateSrv =
+// rosnodejs.require('mir_navigation').srv.PositionMarkerNavigate;
 
 exports.createPositionMarker = async (req, res) => {
   try {

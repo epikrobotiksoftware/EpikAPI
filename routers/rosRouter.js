@@ -29,17 +29,17 @@ router.get(
   rosController.robotStatus
 );
 
-router
-  .route('/positionMarker')
-  .get(positionController.getAllPositionMarkers)
-  .post(positionController.createPositionMarker);
+// router
+//   .route('/positionMarker')
+//   .get(positionController.getAllPositionMarkers)
+//   .post(positionController.createPositionMarker);
 
-router
-  .route('/positionMarker/:id')
-  .get(positionController.getPositionMarker)
-  .delete(positionController.deletePositionMarker);
+// router
+//   .route('/positionMarker/:id')
+//   .get(positionController.getPositionMarker)
+//   .delete(positionController.deletePositionMarker);
 
-router.post('/sendGoal/:id', positionController.sendGoal);
+// router.post('/sendGoal/:id', positionController.sendGoal);
 
 //Actions and Missions
 

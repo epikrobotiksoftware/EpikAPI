@@ -5,7 +5,7 @@ const mapController = require('./mapController');
 
 exports.storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, './upload/');
+    cb(null, './images/');
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname);
@@ -48,7 +48,7 @@ exports.uploadImage = async (req, res) => {
       });
 
     console.log(image);
-    fs.renameSync(`./upload/${image.filename}`, `./upload/${filename}`);
+    fs.renameSync(`./images/${image.filename}`, `./images/${filename}`);
     mapController.mapUpdate();
     console.log('image name changed');
     res.status(200).json({
@@ -65,5 +65,5 @@ exports.uploadImage = async (req, res) => {
   }
 };
 exports.getImage = (req, res) => {
-  res.download('upload/' + req.params.path);
+  res.download('images/' + req.params.path);
 };

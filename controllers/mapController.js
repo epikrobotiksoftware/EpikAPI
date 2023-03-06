@@ -300,7 +300,50 @@ exports.mapConvert = async (req, res) => {
 
       res.status(200).send({ message: 'Image saved successfully' });
     });
+    // cp -r /home/kali/catkin_ws/src/js_pkg/images/convertedImage.png /home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/
+
+    spawnSync('cp', ['-r', process.env.MAP_IMAGE_PATH, MAP_DESTINATION], {
+      shell: true,
+    });
+    fs.readFile(
+      '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.yaml',
+      'utf8',
+      (err, data) => {
+        if (err) throw err;
+
+        // Replace the text
+        let newData = data.replace(
+          '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.pgm',
+          '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/convertedImage.png'
+        );
+
+        // Write the file
+        fs.writeFile(
+          '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.yaml',
+
+          newData,
+          (err) => {
+            if (err) throw err;
+            console.log('File updated');
+          }
+        );
+      }
+    );
+    child = spawn(
+      'roslaunch',
+      [
+        'mir_navigation',
+        'hector_mapping.launch',
+        mapCommand,
+        resolutionCommand,
+      ],
+      {
+        shell: true,
+        detached: true,
+      }
+    );
   } catch (err) {
+    res.status(500).send({ message: err });
     console.log(err);
   }
 };
