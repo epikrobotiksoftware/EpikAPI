@@ -336,19 +336,21 @@ exports.mapConvert = async (req, res) => {
         );
       }
     );
-    child = spawn(
-      'roslaunch',
-      [
-        'mir_navigation',
-        'hector_mapping.launch',
-        // mapCommand,
-        // resolutionCommand,
-      ],
-      {
-        shell: true,
-        detached: true,
-      }
-    );
+    spawn('rosrun', ['map_server', 'map_server', process.env.MAP_YAML_PATH]);
+
+    // child = spawn(
+    //   'roslaunch',
+    //   [
+    //     'mir_navigation',
+    //     'hector_mapping.launch',
+    //     // mapCommand,
+    //     // resolutionCommand,
+    //   ],
+    //   {
+    //     shell: true,
+    //     detached: true,
+    //   }
+    // );
   } catch (err) {
     res.status(500).send({ message: err });
     console.log(err);
