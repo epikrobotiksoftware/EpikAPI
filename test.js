@@ -64,24 +64,48 @@
 //   }
 // );
 /////////////////////////////////////////////////////////////////////////////////////////////
-const Jimp = require('jimp');
 
-// Load the image
-Jimp.read('images/map.jpg')
-  .then((image) => {
-    let degreesToRotate = 90;
+/////////////////////////////////////////////
+//Rotate Image from backend
 
-    // Convert negative degrees to positive
-    while (degreesToRotate < 0) {
-      degreesToRotate += 360;
-    }
+// const Jimp = require('jimp');
 
-    // Rotate the image
-    image.rotate(degreesToRotate);
+// // Load the image
+// Jimp.read('images/map.jpg')
+//   .then((image) => {
+//     let degreesToRotate = 90;
 
-    // Save the rotated image
-    return image.writeAsync('images/map.jpg');
-  })
-  .catch((error) => {
-    console.error(error);
+//     // Convert negative degrees to positive
+//     while (degreesToRotate < 0) {
+//       degreesToRotate += 360;
+//     }
+
+//     // Rotate the image
+//     image.rotate(degreesToRotate);
+
+//     // Save the rotated image
+//     return image.writeAsync('images/map.jpg');
+//   })
+//   .catch((error) => {
+//     console.error(error);
+//   });
+
+const sharp = require('sharp');
+const fs = require('fs');
+
+// Read the PNG image from file
+sharp('images/convertedImage.png')
+  .grayscale()
+  .raw()
+  .toBuffer((err, data, info) => {
+    if (err) throw err;
+
+    // Create a new PGM image with the same dimensions
+    const pgm = `P5\n${info.width} ${info.height}\n255\n`;
+
+    // Write the PGM image to file
+    const stream = fs.createWriteStream('images/my_map.pgm');
+    stream.write(pgm);
+    stream.write(data);
+    stream.end();
   });

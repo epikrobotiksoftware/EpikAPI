@@ -5,6 +5,8 @@ var ip = require('ip');
 const rosnodejs = require('rosnodejs');
 const SetBool = rosnodejs.require('std_srvs').srv.SetBool;
 const fs = require('fs');
+const sharp = require('sharp');
+
 var mapState = 'unactive';
 spawn('rosrun', ['map_server', 'map_server', process.env.MAP_PATH]);
 // console.log(process.env.MAP_PATH);
@@ -300,6 +302,22 @@ exports.mapConvert = async (req, res) => {
 
       res.status(200).send({ message: 'Image saved successfully' });
     });
+    // Read the PNG image from file
+    sharp('images/convertedImage.png')
+      .grayscale()
+      .raw()
+      .toBuffer((err, data, info) => {
+        if (err) throw err;
+
+        // Create a new PGM image with the same dimensions
+        const pgm = `P5\n${info.width} ${info.height}\n255\n`;
+
+        // Write the PGM image to file
+        const stream = fs.createWriteStream('images/my_map.pgm');
+        stream.write(pgm);
+        stream.write(data);
+        stream.end();
+      });
     // cp -r /home/kali/catkin_ws/src/js_pkg/images/convertedImage.png /home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/
     // spawnSync('sleep', ['5'], {
     //   shell: true,
@@ -308,49 +326,15 @@ exports.mapConvert = async (req, res) => {
       'cp',
       [
         '-r',
-        `${process.env.MAP_IMAGE_PATH}map.jpg`,
+        `${process.env.MAP_IMAGE_PATH}my_map.pgm`,
         process.env.MAP_DESTINATION,
       ],
       {
         shell: true,
       }
     );
-    fs.readFile(
-      '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.yaml',
-      'utf8',
-      (err, data) => {
-        if (err) throw err;
 
-        // Replace the text
-        let newData = data.replace('my_map.pgm', 'map.jpg');
-
-        // Write the file
-        fs.writeFile(
-          '/home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/my_map.yaml',
-
-          newData,
-          (err) => {
-            if (err) throw err;
-            console.log('File updated');
-          }
-        );
-      }
-    );
     spawn('rosrun', ['map_server', 'map_server', process.env.MAP_YAML_PATH]);
-
-    // child = spawn(
-    //   'roslaunch',
-    //   [
-    //     'mir_navigation',
-    //     'hector_mapping.launch',
-    //     // mapCommand,
-    //     // resolutionCommand,
-    //   ],
-    //   {
-    //     shell: true,
-    //     detached: true,
-    //   }
-    // );
   } catch (err) {
     res.status(500).send({ message: err });
     console.log(err);
