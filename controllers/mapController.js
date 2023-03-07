@@ -296,7 +296,7 @@ exports.mapConvert = async (req, res) => {
     )[1];
     const filePath = `./images/convertedImage.${imageType}`;
 
-     fs.writeFile(filePath, base64Data, 'base64', (err) => {
+    fs.writeFile(filePath, base64Data, 'base64', (err) => {
       if (err) {
         return res.status(500).send({ error: err });
       }
@@ -306,37 +306,38 @@ exports.mapConvert = async (req, res) => {
     // spawnSync('sleep', ['3'], {
     //   shell: true,
     // });
-    // Read the PNG image from file
-    await Jimp.read('images/convertedImage.png', (err, image) => {
-      if (err) throw err;
+    setTimeout(() => {
+      // Read the PNG image from file
+      sharp('images/convertedImage.png')
+        .grayscale()
+        .raw()
+        .toBuffer((err, data, info) => {
+          if (err) throw err;
 
-      // Convert the image to grayscale and extract the pixel data
-      const grayscale = image.grayscale().bitmap.data;
+          // Create a new PGM image with the same dimensions
+          const pgm = `P5\n${info.width} ${info.height}\n255\n`;
 
-      // Construct a new PGM image with the same dimensions
-      const pgm = `P5\n${image.bitmap.width} ${image.bitmap.height}\n255\n`;
+          // Write the PGM image to file
+          const stream = fs.createWriteStream('images/my_map.pgm');
+          stream.write(pgm);
+          stream.write(data);
+          stream.end();
+        });
+      spawn(
+        'cp',
+        [
+          '-r',
+          `${process.env.MAP_IMAGE_PATH}my_map.pgm`,
+          process.env.MAP_DESTINATION,
+        ],
+        {
+          shell: true,
+        }
+      );
 
-      // Write the PGM image to file
-      const stream = fs.createWriteStream('images/my_map.pgm');
-      stream.write(pgm);
-      stream.write(grayscale);
-      stream.end();
-    });
-    // cp -r /home/kali/catkin_ws/src/js_pkg/images/convertedImage.png /home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/
-
-    spawnSync(
-      'cp',
-      [
-        '-r',
-        `${process.env.MAP_IMAGE_PATH}my_map.pgm`,
-        process.env.MAP_DESTINATION,
-      ],
-      {
-        shell: true,
-      }
-    );
-
-    spawn('rosrun', ['map_server', 'map_server', process.env.MAP_YAML_PATH]);
+      // cp -r /home/kali/catkin_ws/src/js_pkg/images/convertedImage.png /home/kali/catkin_ws/src/mir_robot/mir_gazebo/maps/
+      spawn('xterm', ['-e', 'rosrun', 'map_server', 'map_server', process.env.MAP_YAML_PATH]);
+    }, 4000);
   } catch (err) {
     res.status(500).send({ message: err });
     console.log(err);
