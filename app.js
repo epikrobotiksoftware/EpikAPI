@@ -7,7 +7,7 @@ const userRouter = require('./routers/userRoutes');
 const globalErrorHandler = require('./controllers/errorControler');
 const AppError = require('./utils/appError');
 const app = express();
-app.use(express.json());
+app.use(express.json({limit:'52428800'}));
 const cors = require('cors');
 var bodyParser = require('body-parser');
 const rosRouter = require('./routers/rosRouter');
@@ -39,14 +39,15 @@ const corsOptions = {
 // });
 // app.use(jsonParser);
 // app.use(urlencodedParser);
-app.use(bodyParser.json({ limit: '20971520', type: 'application/json' }));
-app.use(
+app.use('/api',bodyParser.json({ limit: '20971520', type: 'application/json' }));
+app.use('/api',
   bodyParser.urlencoded({
     limit: '20971520',
     extended: true,
     // parameterLimit: 500000000,
   })
 );
+// console.log('Limit file size: '+limit);
 
 const corsOptions = {
   origin: [
