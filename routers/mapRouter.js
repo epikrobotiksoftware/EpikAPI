@@ -14,7 +14,7 @@ router.get('/mapStatus', mapController.mapStatus);
 router.get('/mapUpdate', mapController.mapUpdate);
 router.post(
   '/mapConvert',
-  bodyParser.json({ limit: '5mb' }),
+  bodyParser.json({ limit: '20971520', extended: true }),
   mapController.mapConvert
 );
 

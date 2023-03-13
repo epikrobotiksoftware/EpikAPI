@@ -17,3 +17,6 @@ roslaunch mir_simulation start_map.launch
 npm run start-pm
 --To stop the API in production mode run
 npm run stop-pm
+
+--to install package 
+sudo apt install ros-noetic-rosbridge-*
